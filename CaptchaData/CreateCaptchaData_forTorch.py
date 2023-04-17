@@ -18,13 +18,19 @@ class captchaData(Dataset):
         for _ in range(data_num):
             txt, img = gen_captcha_text_and_image()
             img = img.reshape(1, 3, 60, 160)
-            one_hot_y = one_hot_encode(txt, num_classes, self.characters).reshape(1, 4, 62)
+            # 因應torch的CrossEntropyLoss，將y改為label的值
+            # one_hot_y = one_hot_encode(txt, num_classes, self.characters).reshape(1, 4, 62)
+            txt = [self.characters.index(i) for i in txt]
             if _ == 0:
                 x = img
-                y = one_hot_y
+                # 因應torch的CrossEntropyLoss，將y改為label的值
+                # y = one_hot_y
+                y = [txt]
             else:
                 x = np.append(x, img, axis=0)
-                y = np.append(y, one_hot_y, axis=0)
+                # 因應torch的CrossEntropyLoss，將y改為label的值
+                # y = np.append(y, one_hot_y, axis=0)
+                y = np.append(y, [txt], axis=0)
         self.x = torch.from_numpy(x).to(device)
         self.y = torch.from_numpy(y).to(device)
         self.n_samples = x.shape[0]

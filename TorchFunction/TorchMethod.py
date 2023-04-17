@@ -9,6 +9,7 @@ def train_loop(dataloader, model, loss_fn, optimizer, epochs):
     for epoch in range(epochs):
         for batch, (X, y) in enumerate(dataloader):
             # Compute prediction and loss
+            X = X / 255
             pred = model(X)
             loss = loss_fn(pred, y)
 
