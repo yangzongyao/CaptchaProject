@@ -45,6 +45,7 @@ def test_loop(dataloader, model, loss_fn):
 def predict(model, X, characters, device):
     model.eval()
     X = X.reshape(1,3,60,160)
+    X = X / 255
     pred = model(torch.from_numpy(X).to(device))
     text_idx = pred[0].argmax(1)
     print(''.join([characters[i] for i in text_idx]))

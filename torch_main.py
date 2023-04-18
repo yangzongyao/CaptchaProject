@@ -1,5 +1,5 @@
 # %%
-from TorchFunction.TorchModel import NeuralNetwork
+from TorchFunction.TorchModel import NeuralNetwork, ConvolutionalNeuralNetwork
 from TorchFunction.TorchMethod import train_loop, predict
 from CaptchaData.CreateCaptchaData_forTorch import captchaData
 
@@ -20,10 +20,11 @@ device = (
 )
 print(f"Using {device} device")
 
-model = NeuralNetwork().to(device)
+# model = NeuralNetwork().to(device)
+model = ConvolutionalNeuralNetwork().to(device)
 
 learning_rate = 1e-4
-batch_size = 128
+batch_size = 512
 epochs = 500
 loss_fn = nn.CrossEntropyLoss()
 def word_loss(pred, y):
@@ -35,7 +36,7 @@ def word_loss(pred, y):
 
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-dataset = captchaData(501, device)
+dataset = captchaData(20000, device)
 dataloader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True)
 
 # %%
@@ -49,6 +50,8 @@ dataloader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True)
 # %%
 
 train_loop(dataloader, model, word_loss, optimizer, epochs=epochs)
+torch.save(model.state_dict(), 'cnn_500epoch_20000img.pt')
+
 # %%
 # test code
 txt, img = gen_captcha_text_and_image()
@@ -57,12 +60,13 @@ show_gen_image(txt, img)
 # %%
 # train data
 import numpy as np
-idx = np.random.choice(300, 1)[0]
+idx = np.random.choice(dataset.n_samples, 1)[0]
 img = dataset[idx][0]
 txt = dataset[idx][1].to('cpu')
 txt = ''.join(dataset.characters[i] for i in txt)
 show_gen_image(txt, np.array(img.to('cpu')).reshape(60,160,3))
 x = img.reshape(1,3,60,160)
+x = x / 255
 pred = model(x)
 p = pred[0].argmax(1)
 ''.join([dataset.characters[i] for i in p])
