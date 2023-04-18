@@ -27,6 +27,9 @@ text, img = gen_captcha_text_and_image()
        |---TorchMethod.py  #  定義Torch方法
        |---TorchModel.py   #  定義Torch模型
 ```
-
-
+----------------------------
+## 目前進度
+1. 修改torch模型，改用CNN
+2. 修正loss function寫法
+---------------------------
 ## PLH_ADD
