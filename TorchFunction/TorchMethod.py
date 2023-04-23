@@ -9,8 +9,14 @@ def train_loop(dataloader, model, loss_fn, optimizer, epochs):
     for epoch in range(epochs):
         for batch, (X, y) in enumerate(dataloader):
             # Compute prediction and loss
+            
+            
+            # 測試CRNN
             X = X[:,0,:,:]
             X = X.reshape(20, 1, 60, 160)
+            # 測試CRNN
+
+
             X = X / 255
             pred = model(X)
             loss = loss_fn(pred, y)
