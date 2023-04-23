@@ -31,7 +31,7 @@ class NeuralNetwork(nn.Module):
 class ConvolutionalNeuralNetwork(nn.Module):
     def __init__(self):
         super().__init__()
-        self.linear_relu_stack = nn.Sequential(
+        self.cnn_relu_stack = nn.Sequential(
             nn.Conv2d(3, 32, kernel_size=3),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2),
@@ -52,6 +52,95 @@ class ConvolutionalNeuralNetwork(nn.Module):
         )
 
     def forward(self, x):
-        logits = self.linear_relu_stack(x)
+        logits = self.cnn_relu_stack(x)
         return logits
+    
+class CRNN(nn.Module):
+    def __init__(self):
+        super(CRNN, self).__init__()
+        self.crnn_stack = nn.Sequential(
+            nn.Conv2d(1, 64, kernel_size=3),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+            nn.Conv2d(64, 128, kernel_size=3),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+            nn.Conv2d(128, 256, kernel_size=3),
+            nn.ReLU(),
+            nn.Conv2d(256, 256, kernel_size=3),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=(1,2), stride=2),
+            nn.Conv2d(256, 512, kernel_size=3),
+            nn.ReLU(),
+            nn.BatchNorm2d(512),
+            nn.Conv2d(512, 512, kernel_size=3),
+            nn.ReLU(),
+            nn.BatchNorm2d(512),
+            nn.MaxPool2d(kernel_size=(1, 2), stride=2),
+            # 因為圖片大小太小，無法使用此層
+            # nn.Conv2d(512, 512, kernel_size=2, stride=1, padding=0),
+            # nn.ReLU(),
+        )
+        self.Flatten = nn.Linear(512*1, 64)
+        self.LSTM1 = nn.LSTM(64, 256, bidirectional=True)
+        self.LSTM2 = nn.LSTM(2*256, 256, bidirectional=True)
+        self.output = nn.Linear(2*256, 62)
+
+    def forward(self, x):
+        x = self.crnn_stack(x)
+        
+        batch, channel, height, weight = x.size()
+        x = x.view(batch, channel*height, weight)
+        x = x.permute(2, 0, 1)
+        x = self.Flatten(x)
+        result, _ = self.LSTM1(x)
+        result, _ = self.LSTM2(result)
+        logits = self.output(result)
+        
+        return logits
+    
 # %%
+def test_code():
+    x = next(iter(dataloader))[0]
+    X = x[:,0,:,:]
+    X = X.reshape(20, 1, 60, 160).to('cpu')
+
+    crnn_stack = nn.Sequential(
+        nn.Conv2d(1, 64, kernel_size=3),
+        nn.ReLU(),
+        nn.MaxPool2d(kernel_size=2, stride=2),
+        nn.Conv2d(64, 128, kernel_size=3),
+        nn.ReLU(),
+        nn.MaxPool2d(kernel_size=2, stride=2),
+        nn.Conv2d(128, 256, kernel_size=3),
+        nn.ReLU(),
+        nn.Conv2d(256, 256, kernel_size=3),
+        nn.ReLU(),
+        nn.MaxPool2d(kernel_size=(1,2), stride=2),
+        nn.Conv2d(256, 512, kernel_size=3),
+        nn.ReLU(),
+        nn.BatchNorm2d(512),
+        nn.Conv2d(512, 512, kernel_size=3),
+        nn.ReLU(),
+        nn.BatchNorm2d(512),
+        nn.MaxPool2d(kernel_size=(1, 2), stride=2),
+        # 因為圖片大小太小，無法使用此層
+        # nn.Conv2d(512, 512, kernel_size=2, stride=1, padding=0),
+        # nn.ReLU(),
+    )
+
+    pred = crnn_stack(X)
+    batch, channel, height, weight = pred.size()
+    pred = pred.view(batch, channel*height, weight)
+    print(pred.shape)
+    pred = pred.permute(2, 0, 1)
+    print(pred.shape)
+    f = nn.Linear(channel*height, 64)
+    pred = f(pred)
+    print(pred.shape)
+    LSTM1 = nn.LSTM(64, 256, bidirectional=True)
+    pred, _ = LSTM1(pred)
+    LSTM2 = nn.LSTM(2*256, 256, bidirectional=True)
+    pred, _ = LSTM2(pred)
+    output = nn.Linear(2*256, 62)
+    pred = output(pred)

@@ -1,5 +1,5 @@
 # %%
-from TorchFunction.TorchModel import NeuralNetwork, ConvolutionalNeuralNetwork
+from TorchFunction.TorchModel import NeuralNetwork, ConvolutionalNeuralNetwork, CRNN
 from TorchFunction.TorchMethod import train_loop, predict
 from CaptchaData.CreateCaptchaData_forTorch import captchaData
 
@@ -21,7 +21,8 @@ device = (
 print(f"Using {device} device")
 
 # model = NeuralNetwork().to(device)
-model = ConvolutionalNeuralNetwork().to(device)
+# model = ConvolutionalNeuralNetwork().to(device)
+model = CRNN().to(device)
 
 learning_rate = 1e-4
 batch_size = 512
@@ -36,21 +37,12 @@ def word_loss(pred, y):
 
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-dataset = captchaData(20000, device)
+dataset = captchaData(20, device)
 dataloader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True)
-
-# %%
-# loss test
-# x, y = next(iter(dataloader))
-# pred = model(x)
-# print(pred.argmax(-1)[0])
-# print(y[0])
-# word_loss(pred, y)
-
 # %%
 
-train_loop(dataloader, model, word_loss, optimizer, epochs=epochs)
-torch.save(model.state_dict(), 'cnn_500epoch_20000img.pt')
+train_loop(dataloader, model, loss_fn, optimizer, epochs=epochs)
+# torch.save(model.state_dict(), 'cnn_500epoch_20000img.pt')
 
 # %%
 # test code
