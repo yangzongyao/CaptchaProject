@@ -29,7 +29,15 @@ text, img = gen_captcha_text_and_image()
 ```
 ----------------------------
 ## 目前進度
-1. 修改torch模型，改用CNN
+1. ~~修改torch模型，改用CNN~~ (訓練20k圖片、500epoch發現無法general於Test Set)
 2. 修正loss function寫法
+3. 使用RCNN (OCR任務常用)
+---------------------------
+## Ref.
+1. [文本辨識網頁分享](https://aiacademy.tw/ai-optical-character-recognition/)
+2. [TrOCR](./Ref/TrOCR.pdf)
+3. [TextRecognition](./Ref/TextRec.pdf)
+4. [CRNN](https://cinnamonaitaiwan.medium.com/ocr-驗證碼識別理論與實作-a97273a5657d)
+
 ---------------------------
 ## PLH_ADD
