@@ -9,8 +9,9 @@ from random import choice
 number = ['0','1','2','3','4','5','6','7','8','9']
 alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
 ALPHABET = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
+space = ['-']
 
-def random_captcha_text(char_set=number+alphabet+ALPHABET, captcha_size=4):
+def random_captcha_text(char_set=space+number+alphabet+ALPHABET, captcha_size=4):
     captcha_text = []
     for i in range(captcha_size):
         c = choice(char_set)
@@ -29,7 +30,7 @@ def gen_captcha_text_and_image():
  
     captcha_image = Image.open(captcha)
     captcha_image = np.array(captcha_image)
-    captcha_image = captcha_image.astype(np.float32)
+    captcha_image = captcha_image
     return captcha_text, captcha_image
  
 def show_gen_image(text, image):

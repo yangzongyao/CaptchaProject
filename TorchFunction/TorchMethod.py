@@ -9,28 +9,33 @@ def train_loop(dataloader, model, loss_fn, optimizer, epochs):
     for epoch in range(epochs):
         for batch, (X, y) in enumerate(dataloader):
             # Compute prediction and loss
-            
-            
             # 測試CRNN
-            X = X[:,0,:,:]
-            X = X.reshape(20, 1, 60, 160)
-            # 測試CRNN
-
-
+            batch_size = X.shape[0]
             X = X / 255
             pred = model(X)
-            loss = loss_fn(pred, y)
+            pred = pred.log_softmax(2)
+            pred_space_length = pred.shape[0]
+            y_space_length = y.shape[1]
+            # loss = loss_fn(pred, y)
+            input_lengths = torch.full(size=(batch_size,), fill_value=pred_space_length, dtype=torch.long)
+            target_lengths = torch.full(size=(batch_size,), fill_value=y_space_length, dtype=torch.long)
+
+            loss = loss_fn(log_probs=pred, targets=y, target_lengths=target_lengths, input_lengths=input_lengths)
 
             # Backpropagation
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
-            if batch % 1 == 0:
-                loss, current = loss.item(), (batch + 1) * len(X)
-                print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
+            if batch % 30 == 0:
+                pass
+                # loss, current = loss.item(), (batch + 1) * len(X)
+                # print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
         pred = model(X)
-        loss = loss_fn(pred, y)
+        pred = pred.log_softmax(2)
+        loss = loss_fn(log_probs=pred, targets=y, target_lengths=target_lengths, input_lengths=input_lengths)
+
+        # loss = loss_fn(pred, y)
         loss, current = loss.item(), (epoch + 1)
         print(f"epoch loss: {loss:>7f}  [{current:>5d}/{epoch_size:>5d}]")
 

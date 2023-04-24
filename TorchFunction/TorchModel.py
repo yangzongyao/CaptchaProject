@@ -19,8 +19,8 @@ class NeuralNetwork(nn.Module):
             nn.ReLU(),
             nn.Linear(512, 512),
             nn.ReLU(),
-            nn.Linear(512, 4*62),
-            Reshape(4, 62)
+            nn.Linear(512, 4*63),
+            Reshape(4, 63)
         )
 
     def forward(self, x):
@@ -47,8 +47,8 @@ class ConvolutionalNeuralNetwork(nn.Module):
             nn.Flatten(),
             nn.Linear(2048, 512),
             nn.ReLU(),
-            nn.Linear(512, 4*62),
-            Reshape(4, 62)
+            nn.Linear(512, 4*63),
+            Reshape(4, 63)
         )
 
     def forward(self, x):
@@ -84,7 +84,7 @@ class CRNN(nn.Module):
         self.Flatten = nn.Linear(512*1, 64)
         self.LSTM1 = nn.LSTM(64, 256, bidirectional=True)
         self.LSTM2 = nn.LSTM(2*256, 256, bidirectional=True)
-        self.output = nn.Linear(2*256, 62)
+        self.output = nn.Linear(2*256, 63)
 
     def forward(self, x):
         x = self.crnn_stack(x)
@@ -101,8 +101,7 @@ class CRNN(nn.Module):
     
 # %%
 def test_code():
-    x = next(iter(dataloader))[0]
-    X = x[:,0,:,:]
+    X = next(iter(dataloader))[0]
     X = X.reshape(20, 1, 60, 160).to('cpu')
 
     crnn_stack = nn.Sequential(
@@ -130,6 +129,7 @@ def test_code():
     )
 
     pred = crnn_stack(X)
+    print(pred.shape)
     batch, channel, height, weight = pred.size()
     pred = pred.view(batch, channel*height, weight)
     print(pred.shape)
@@ -142,5 +142,5 @@ def test_code():
     pred, _ = LSTM1(pred)
     LSTM2 = nn.LSTM(2*256, 256, bidirectional=True)
     pred, _ = LSTM2(pred)
-    output = nn.Linear(2*256, 62)
+    output = nn.Linear(2*256, 63)
     pred = output(pred)

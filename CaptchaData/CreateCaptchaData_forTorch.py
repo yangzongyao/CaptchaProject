@@ -8,16 +8,21 @@ def one_hot_encode(text, num_classes, characters):
     return np.array([np.eye(num_classes)[characters.index(c)] for c in text],dtype=np.float32)
 
 class captchaData(Dataset):
-    def __init__(self, data_num=101, device="cpu"):
+    def __init__(self, data_num=101, device="cpu", gray=False):
         number = ['0','1','2','3','4','5','6','7','8','9']
         alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
         ALPHABET = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
+        space = ['-']
 
-        self.characters = number + alphabet + ALPHABET
+        self.characters = space + number + alphabet + ALPHABET
         num_classes = len(self.characters)
         for _ in range(data_num):
             txt, img = gen_captcha_text_and_image()
-            img = img.reshape(1, 3, 60, 160)
+            if(gray):
+                img = np.dot(img, [0.2989, 0.5870, 0.1140])
+                img = img.reshape(1, 1, 60, 160).astype(np.float32)
+            else:
+                img = img.reshape(1, 3, 60, 160)
             # 因應torch的CrossEntropyLoss，將y改為label的值
             # one_hot_y = one_hot_encode(txt, num_classes, self.characters).reshape(1, 4, 62)
             txt = [self.characters.index(i) for i in txt]
