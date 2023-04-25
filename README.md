@@ -31,13 +31,14 @@ text, img = gen_captcha_text_and_image()
 ## 目前進度
 1. ~~修改torch模型，改用CNN~~ (訓練20k圖片、500epoch發現無法general於Test Set)
 2. 修正loss function寫法
-3. 使用RCNN (OCR任務常用)
+3. ~~使用CRNN (OCR任務常用)~~
+4. 已建立CRNN，且新增CTC loss，尚須理解CTC loss作法；以及增加訓練集，增加epoch測試看看模型效果
 ---------------------------
 ## Ref.
 1. [文本辨識網頁分享](https://aiacademy.tw/ai-optical-character-recognition/)
 2. [TrOCR](./Ref/TrOCR.pdf)
-3. [TextRecognition](./Ref/TextRec.pdf)
-4. [CRNN](https://cinnamonaitaiwan.medium.com/ocr-驗證碼識別理論與實作-a97273a5657d)
+3. [CRNN paper](./Ref/TextRec.pdf)
+4. [CRNN 網頁](https://cinnamonaitaiwan.medium.com/ocr-驗證碼識別理論與實作-a97273a5657d)
 
 ---------------------------
 ## PLH_ADD
