@@ -39,12 +39,12 @@ def word_loss(pred, y):
 
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-dataset = captchaData(20, device, gray=True)
+dataset = captchaData(2000, device, gray=True)
 dataloader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True)
 # %%
 
 train_loop(dataloader, model, loss_fn, optimizer, epochs=epochs)
-# torch.save(model.state_dict(), 'cnn_500epoch_20000img.pt')
+torch.save(model.state_dict(), 'crnn_100epoch_2000img.pt')
 
 # %%
 # test code

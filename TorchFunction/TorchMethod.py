@@ -1,5 +1,6 @@
 # %%
 import torch
+import numpy as np
 
 # %%
 def train_loop(dataloader, model, loss_fn, optimizer, epochs):
@@ -57,9 +58,10 @@ def test_loop(dataloader, model, loss_fn):
 
 def predict(model, X, characters, device):
     model.eval()
-    X = X.reshape(1,3,60,160)
+    X = np.dot(X, [0.2989, 0.5870, 0.1140])
+    X = X.reshape(1,1,60,160).astype(np.float32)
     X = X / 255
     pred = model(torch.from_numpy(X).to(device))
-    text_idx = pred[0].argmax(1)
+    text_idx = pred[:,0,:].argmax(1)
     print(''.join([characters[i] for i in text_idx]))
 # %%
