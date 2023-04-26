@@ -7,17 +7,18 @@ from TorchFunction.TorchModel import NeuralNetwork, ConvolutionalNeuralNetwork, 
 from TorchFunction.TorchMethod import train_loop, predict
 # %%
 device = 'cpu'
-batch = 10
+batch_size = 10
 dataset = captchaData(20, device, gray=True)
 dataloader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True)
 model = CRNN()
-model.load_state_dict(torch.load('Weights/crnn_100epoch_2000img.pt'))
+model.load_state_dict(torch.load('Weights/crnn_300epoch_20000img.pt'))
 
 # %%
 # test code
-txt, img = gen_captcha_text_and_image()
-predict(model, img, dataset.characters, device)
-show_gen_image(txt, img)
+for _ in range(5):
+    txt, img = gen_captcha_text_and_image()
+    predict(model, img, dataset.characters, device)
+    show_gen_image(txt, img)
 # %%
 # 注意這邊的train set跟訓練用的不會一樣
 x, y = next(iter(dataloader))
@@ -31,10 +32,10 @@ y_space_length = y.shape[1]
 input_lengths = torch.full(size=(x.shape[0],), fill_value=pred_space_length, dtype=torch.long)
 target_lengths = torch.full(size=(x.shape[0],), fill_value=y_space_length, dtype=torch.long)
 
-loss = loss_fn(log_probs=pred, targets=y, target_lengths=target_lengths, input_lengths=input_lengths)
-print(pred[:,0,:].argmax(1))
-print(y[0,:])
-print(loss)
+# loss = loss_fn(log_probs=pred, targets=y, target_lengths=target_lengths, input_lengths=input_lengths)
+# print(pred[:,0,:].argmax(1))
+# print(y[0,:])
+# print(loss)
 
 # %%
 # train data
@@ -49,3 +50,5 @@ X = X / 255
 pred = model(X)
 p = pred[:,0,:].argmax(1)
 ''.join([dataset.characters[i] for i in p])
+
+# %%
