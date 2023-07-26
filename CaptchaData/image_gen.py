@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 from PIL import Image, ImageDraw
 import random
 import pathlib as Path
-
-ROOT = Path.Path(__file__).parent.parent
+import numpy as np
+ROOT = Path.Path(__file__).parent
 DIR_IMAGE = ROOT / 'image'
 DIR_IMAGE.mkdir(parents=True, exist_ok=True)
 
@@ -116,7 +116,7 @@ def gen_captcha_text_and_image(captcha_size=4, width=160, height=60):
     return captcha_text, captcha_image, chars_l, rect_l
  
 ####################################################################
-#                           Main & Output                          #
+#                           main & save                            #
 ####################################################################
 def image_generate(N = 1000, width = 160, height = 60):
     for idx in range(N):
@@ -139,7 +139,7 @@ def image_generate(N = 1000, width = 160, height = 60):
         # Each txt for one jpg image
         # Every classes in txt has one row  classID x y w h 
         # x y w h are belong to [0,1] ratio, and x y are center points
-        Info_x_y_w_h = [[(rect[0]+rect[2])/2, (rect[1]+rect[3])/2 , (rect[2]-rect[0])/2, (rect[3]-rect[1])/2] for rect in rect_l]
+        Info_x_y_w_h = [[(rect[0]+rect[2])/2, (rect[1]+rect[3])/2 , (rect[2]-rect[0]), (rect[3]-rect[1])] for rect in rect_l]
         str_Info = [f'{Info[0]} {Info[1]} {Info[2]} {Info[3]}' for Info in Info_x_y_w_h]
         txt = [f"{classes_dict[chars_l[i]]} " + str_Info[i] + "\n" for i in range(len(chars_l))]
 
@@ -155,8 +155,19 @@ def classes_generate():
     with open(ROOT / f'classes.txt', 'w') as f:
         f.writelines(classes)
         # f.close()
+def shuffle_train_valid_generate(N=1000):
+    train_idx = np.random.randint(0, N, int(N*0.8))
+    train_idx.sort()
+    valid_idx = set(range(N)) - set(train_idx)
+    str_train_image = [str(DIR_IMAGE.absolute() / f'image{idx}.jpg').replace('\\', '/')+"\n" for idx in list(train_idx)]
+    str_valid_image = [str(DIR_IMAGE.absolute() / f'image{idx}.jpg').replace('\\', '/')+"\n" for idx in list(valid_idx)]
+
+    with open(DIR_IMAGE / f'train.txt', 'w') as f:
+        f.writelines(str_train_image)
+    with open(DIR_IMAGE / f'valid.txt', 'w') as f:
+        f.writelines(str_valid_image)
 # %%
 if __name__ == '__main__':    
     classes_generate()
     image_generate()
-
+    shuffle_train_valid_generate()
