@@ -43,9 +43,9 @@ idx = np.random.choice(dataset.n_samples, 1)[0]
 img = dataset[idx][0]
 txt = dataset[idx][1].to('cpu')
 txt = ''.join(dataset.characters[i] for i in txt)
-show_gen_image(txt, np.array(img.to('cpu')).reshape(60,160,1))
-X = img.reshape(1,1,60,160)
+show_gen_image(txt, np.array(img.to('cpu')).reshape(60,160,3))
+X = img.reshape(1,3,60,160)
 X = X / 255
 pred = model(X)
-p = pred[:,0,:].argmax(1)
+p = pred[:,:,:].argmax(2)[0]
 ''.join([dataset.characters[i] for i in p])

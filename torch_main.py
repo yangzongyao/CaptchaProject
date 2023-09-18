@@ -18,7 +18,7 @@ device = (
     if torch.backends.mps.is_available()
     else "cpu"
 )
-# device = 'cpu'
+device = 'cpu'
 print(f"Using {device} device")
 
 # model = NeuralNetwork().to(device)
@@ -39,12 +39,12 @@ loss_fn = nn.CTCLoss()
 
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-dataset = captchaData(20000, device, gray=True)
+dataset = captchaData(200, device, gray=True)
 dataloader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True)
 # %%
 
 train_loop(dataloader, model, loss_fn, optimizer, epochs=epochs)
-torch.save(model.state_dict(), 'crnn_300epoch_20000img.pt')
+# torch.save(model.state_dict(), 'crnn_300epoch_20000img.pt')
 
 
 # %%
